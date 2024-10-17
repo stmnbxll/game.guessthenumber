@@ -54,9 +54,9 @@ class GuessTheNumberApp(ctk.CTk):
         self.attempts += 1
 
         if player_guess < self.number_to_guess:
-            self.result_label.configure(text="Больше! Попробуйте еще раз")
+            self.result_label.configure(text="Больше! Попробуй еще раз")
         elif player_guess > self.number_to_guess:
-            self.result_label.configure(text="Меньше! Попробуйте еще раз")
+            self.result_label.configure(text="Меньше! Попробуй еще раз")
         else:
             self.result_label.configure(text=f"Поздравляю! Ты угадал число {self.number_to_guess} за {self.attempts} попыток")
             self.submit_button.configure(state="disabled")
