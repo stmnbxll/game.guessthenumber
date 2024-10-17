@@ -1,0 +1,47 @@
+{
+  "CTk": {
+    "fg_color": ["gray92", "gray14"]
+  },
+  "CTkLabel": {
+    "corner_radius": 0,
+    "fg_color": "transparent",
+    "text_color": ["gray10", "#DCE4EE"]
+  },
+  "CTkButton": {
+    "corner_radius": 6,
+    "border_width": 0,
+    "fg_color": ["#800080", "purple"],
+    "hover_color": ["#9932CC", "#9400D3"],
+    "border_color": ["#3E454A", "#949A9F"],
+    "text_color": ["gray98", "#DCE4EE"],
+    "text_color_disabled": ["gray78", "gray68"]
+  },
+  "CTkEntry": {
+    "corner_radius": 6,
+    "border_width": 2,
+    "fg_color": ["#F9F9FA", "#343638"],
+    "border_color": ["#979DA2", "#565B5E"],
+    "text_color": ["gray10", "#DCE4EE"],
+    "placeholder_text_color": ["gray52", "gray62"]
+  },
+  "CTkToplevel": {
+    "fg_color": ["gray92", "gray14"]
+  },
+  "CTkFont": {
+    "macOS": {
+      "family": "SF Display",
+      "size": 13,
+      "weight": "normal"
+    },
+    "Windows": {
+      "family": "Roboto",
+      "size": 13,
+      "weight": "normal"
+    },
+    "Linux": {
+      "family": "Roboto",
+      "size": 13,
+      "weight": "normal"
+    }
+  }
+}
