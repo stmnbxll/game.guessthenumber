@@ -1,2 +1,2 @@
 # GuessTheNumber
-My simple game written in Python using the customtkinter library
+My simple game written in Python using the customtkinter and pygame library
