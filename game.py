@@ -30,14 +30,14 @@ class GuessTheNumberApp(ctk.CTk):
         self.difficulty_label = ctk.CTkLabel(self, text="Выбери уровень сложности")
         self.difficulty_label.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
 
-        self.easy_button = ctk.CTkButton(self, text="Легкий (1-50)", command=lambda: self.start_game(50))
-        self.easy_button.grid(row=1, column=0, padx=20, pady=5, sticky="nsew")
+        self.easy_button = ctk.CTkButton(self, text="Легкий (1-50)", command=lambda: self.start_game(50), height=70)
+        self.easy_button.grid(row=1, column=0, padx=20, pady=5, sticky="ew")
 
-        self.medium_button = ctk.CTkButton(self, text="Средний (1-100)", command=lambda: self.start_game(100))
-        self.medium_button.grid(row=2, column=0, padx=20, pady=5, sticky="nsew")
+        self.medium_button = ctk.CTkButton(self, text="Средний (1-100)", command=lambda: self.start_game(100), height=70)
+        self.medium_button.grid(row=2, column=0, padx=20, pady=5, sticky="ew")
 
-        self.hard_button = ctk.CTkButton(self, text="Тяжелый (1-200)", command=lambda: self.start_game(200))
-        self.hard_button.grid(row=3, column=0, padx=20, pady=5, sticky="nsew")
+        self.hard_button = ctk.CTkButton(self, text="Тяжелый (1-200)", command=lambda: self.start_game(200), height=70)
+        self.hard_button.grid(row=3, column=0, padx=20, pady=5, sticky="ew")
 
         self.label = ctk.CTkLabel(self, text="Угадай число")
         self.entry = ctk.CTkEntry(self)
@@ -54,10 +54,13 @@ class GuessTheNumberApp(ctk.CTk):
             "Профессионал": False,
             "Заядлый игрок": False,
             "Суперзвезда": False,
+            "Экстрасенс": False,
+            "Мастер угадываний": False,
         }
         self.games_played = 0
         self.total_attempts = 0
         self.record_attempts = float('inf')
+        self.guesses_made = 0
 
         self.load_achievements()
         self.load_stats()
@@ -78,13 +81,15 @@ class GuessTheNumberApp(ctk.CTk):
                 self.games_played = data.get("games_played", 0)
                 self.total_attempts = data.get("total_attempts", 0)
                 self.record_attempts = data.get("record_attempts", float('inf'))
+                self.guesses_made = data.get("guesses_made", 0)
 
     def save_stats(self):
         with open("stats.json", "w") as file:
             json.dump({
                 "games_played": self.games_played,
                 "total_attempts": self.total_attempts,
-                "record_attempts": self.record_attempts
+                "record_attempts": self.record_attempts,
+                "guesses_made": self.guesses_made
             }, file)
 
     def start_game(self, max_value):
@@ -115,6 +120,11 @@ class GuessTheNumberApp(ctk.CTk):
         self.games_played += 1
         self.save_stats()
 
+        if self.games_played == 1 and not self.achievements["Новичок"]:
+            self.achievements["Новичок"] = True
+            self.show_achievement_notification("Новичок!")
+            self.save_achievements()
+
         if self.games_played == 10 and not self.achievements["Заядлый игрок"]:
             self.achievements["Заядлый игрок"] = True
             self.show_achievement_notification("Заядлый игрок!")
@@ -144,6 +154,8 @@ class GuessTheNumberApp(ctk.CTk):
             self.result_label.configure(text="Меньше! Попробуй еще раз")
             play_sound("sounds/wrong_guess.mp3")
         else:
+            self.guesses_made += 1
+            self.save_stats()
             self.result_label.configure(
                 text=f"Поздравляю! Ты угадал число {self.number_to_guess} за {self.attempts} попыток")
             self.submit_button.configure(state="disabled")
@@ -176,20 +188,31 @@ class GuessTheNumberApp(ctk.CTk):
             self.show_achievement_notification("Заядлый игрок!")
             self.save_achievements()
 
-        if self.games_played >= 1 and not self.achievements["Новичок"]:
-            self.achievements["Новичок"] = True
-            self.show_achievement_notification("Новичок!")
+        if self.attempts <= 3:
+            if not hasattr(self, 'successful_attempts'):
+                self.successful_attempts = 0
+            self.successful_attempts += 1
+        else:
+            self.successful_attempts = 0
+
+        if self.successful_attempts >= 5 and not self.achievements["Экстрасенс"]:
+            self.achievements["Экстрасенс"] = True
+            self.show_achievement_notification("Экстрасенс!")
+            self.save_achievements()
+
+        if self.guesses_made >= 10 and not self.achievements["Мастер угадываний"]:
+            self.achievements["Мастер угадываний"] = True
+            self.show_achievement_notification("Мастер угадываний!")
             self.save_achievements()
 
     def show_achievement_notification(self, achievement):
-        messagebox.showinfo("Достижение!", f"Поздравляем! Ты достиг: {achievement}")
+        messagebox.showinfo("Достижение", f"Поздравляю! Ты достиг: {achievement}")
 
     def show_achievements(self):
-        achievements_text = "Достижения:\n"
-        for achievement, achieved in self.achievements.items():
-            status = "Достигнуто" if achieved else "Не достигнуто"
-            achievements_text += f"{achievement}: {status}\n"
-
+        achievements_text = ""
+        for achievement, status in self.achievements.items():
+            status_text = "Достигнуто" if status else "Не достигнуто"
+            achievements_text += f"{achievement}: {status_text}\n"
         messagebox.showinfo("Достижения", achievements_text)
 
     def show_stats(self):
@@ -197,23 +220,24 @@ class GuessTheNumberApp(ctk.CTk):
         stats_text = (
             f"Общее количество сыгранных игр: {self.games_played}\n"
             f"Общее количество попыток: {self.total_attempts}\n"
-            f"Рекордная попытка: {record_attempts_display}"
+            f"Рекордная попытка: {record_attempts_display}\n"
+            f"Количество угаданных чисел: {self.guesses_made}"
         )
         messagebox.showinfo("Статистика", stats_text)
 
     def restart_game(self):
-        self.difficulty_label.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
-        self.easy_button.grid(row=1, column=0, padx=20, pady=5, sticky="nsew")
-        self.medium_button.grid(row=2, column=0, padx=20, pady=5, sticky="nsew")
-        self.hard_button.grid(row=3, column=0, padx=20, pady=5, sticky="nsew")
-
         self.label.grid_forget()
         self.entry.grid_forget()
         self.submit_button.grid_forget()
         self.result_label.grid_forget()
         self.restart_button.grid_forget()
-        self.stats_button.grid_forget()
         self.achievements_button.grid_forget()
+        self.stats_button.grid_forget()
+
+        self.difficulty_label.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
+        self.easy_button.grid(row=1, column=0, padx=20, pady=5, sticky="ew")
+        self.medium_button.grid(row=2, column=0, padx=20, pady=5, sticky="ew")
+        self.hard_button.grid(row=3, column=0, padx=20, pady=5, sticky="ew")
 
         self.entry.delete(0, ctk.END)
         self.result_label.configure(text="")
