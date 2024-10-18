@@ -115,6 +115,11 @@ class GuessTheNumberApp(ctk.CTk):
         self.games_played += 1
         self.save_stats()
 
+        if self.games_played == 10 and not self.achievements["Заядлый игрок"]:
+            self.achievements["Заядлый игрок"] = True
+            self.show_achievement_notification("Заядлый игрок!")
+            self.save_achievements()
+
     def check_guess(self):
         player_guess = self.entry.get()
 
