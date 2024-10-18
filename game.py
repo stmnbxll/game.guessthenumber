@@ -1,5 +1,12 @@
 import random
 import customtkinter as ctk
+import pygame
+
+pygame.mixer.init()
+
+def play_sound(file):
+    pygame.mixer.music.load(file)
+    pygame.mixer.music.play()
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("themes\purple.json")
@@ -58,6 +65,7 @@ class GuessTheNumberApp(ctk.CTk):
         self.entry.delete(0, ctk.END)
         self.submit_button.configure(state="normal")
         self.result_label.configure(text="")
+        play_sound("sounds/restart_game.mp3")
 
     def check_guess(self):
         player_guess = self.entry.get()
@@ -76,11 +84,14 @@ class GuessTheNumberApp(ctk.CTk):
 
         if player_guess < self.number_to_guess:
             self.result_label.configure(text="Больше! Попробуй еще раз")
+            play_sound("sounds/wrong_guess.mp3")
         elif player_guess > self.number_to_guess:
             self.result_label.configure(text="Меньше! Попробуй еще раз")
+            play_sound("sounds/wrong_guess.mp3")
         else:
             self.result_label.configure(text=f"Поздравляю! Ты угадал число {self.number_to_guess} за {self.attempts} попыток")
             self.submit_button.configure(state="disabled")
+            play_sound("sounds/correct_guess.mp3")
 
     def restart_game(self):
         self.label.grid_forget()
