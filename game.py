@@ -1,3 +1,5 @@
+# by stmnbxll
+
 import random
 import customtkinter as ctk
 import pygame
